@@ -1,0 +1,5 @@
+# MT4 Backtester - Python Dependencies
+python-dotenv>=1.0.0
+pandas>=2.0.0
+lxml>=6.0.0
+openpyxl>=3.0.0
