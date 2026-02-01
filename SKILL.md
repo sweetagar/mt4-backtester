@@ -11,6 +11,7 @@ Python-based automation system for MT4 backtesting workflows.
 
 ### CWD (Current Working Directory)
 The project folder where commands are executed. Contains configuration and data.
+***IMPORTANT*** Always first read .env file in CWD to find out where things are!
 
 ```
 C:\Users\adrian\dev\mt4-test-folder\     # CWD
@@ -182,31 +183,20 @@ mt4_spread_params=entry_max_spread_allowed_in_points,exit_max_spread_allowed_in_
 ```
 
 ### Parallel Testing (Future: mt4_parallel.py)
-Distribute tests across mt4-01/02/03/04 for faster execution.
+
+**Terminal Pool Pattern** - Queue tasks and start queued tasks as terminals free up:
+***IMPORTANT*** Make Sure MAX terminal background tasks is running until task completed without error
+1. Start up to number of terminals in .env
+2. Monitor with TaskOutput - check each task as it completes
+3. When a terminal completes:
+    - Parse (without --output) and verify results
+    - If `trade_num = 0` (data not available) or missing report: **rerun on same terminal**
+    - Release terminal for next queued task after successful parse
+4. Parse (WITH --output) new completed htm report upon completion when waiting for tasks
+5. Start new backtround immediately if a task is completed without error, repeat until queue empty
+
 **MAX concurrent tests = Number of terminals in .env** (mt4-XX entries)
 
-
-### QC - Spread Boundary Detection (Future: spread_sweep.py)
-Find spread points where EA performance degrades:
-```
-1. Run tests across spread range (e.g., 5-50, step 5)
-2. Extract profit/DD/trades per spread
-3. Identify degradation boundaries
-4. Save to CSV
-```
-
-### SL Hunting Optimization (Future: optimize.py)
-Find EA parameters that avoid catastrophic losses:
-```
-1. Run full backtest
-2. If SL detected:
-   a. Locate SL date/time
-   b. Define focus window = [SL_date - 1 month, SL_date]
-   c. Vary EA params, test only on focus window
-   d. Until pass, repeat (c)
-3. Run full backtest with new params
-4. If new SL elsewhere, repeat from (2)
-```
 
 ## Technical Notes
 
@@ -252,7 +242,7 @@ When user requests a backtest, gather missing parameters using AskUserQuestion T
 | Parameter | Ask If Missing? | Notes |
 |-----------|-----------------|-------|
 | `--set` | YES | List .set files in `sets/`, user selects |
-| `--ea` | YES | List EAs in mt4/MQL4/Experts/, user selects |
+| `--ea` | YES | List EAs in <terminal_folder in .env>\MQL4\Experts\, user selects |
 | `--symbol` | YES | No default - user must specify |
 | `--spread` | YES | No default - user must specify |
 | `--fromdate/--todate` | YES | No default - "Full Period" = 2000.01.01 to today |
@@ -279,8 +269,8 @@ User: Yes → Run
 
 **After backtest completes:**
 
-1. **Check trade_num**: If `trade_num = 0`, **rerun the test** (data may not have loaded properly)
-2. **Parse to CSV**: Automatically run `parse_report.py` and append to `mt4_bt_log.csv` (default behavior unless otherwise requested)
+1. **Parse and verify**: If `trade_num = 0` (data not available) or report missing, **rerun the test**
+2. **Parse to CSV**: After successful parse, append to `mt4_bt_log.csv` (default behavior unless otherwise requested)
 3. **Show results**: Display key metrics from the parsed CSV entry
 
 **Do NOT ask** "Parse to CSV?" - this is automatic by default.
