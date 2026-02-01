@@ -349,6 +349,12 @@ def main():
                 except Exception as e:
                     print(f"    ERROR: {e}")
 
+        # Print results to stdout first (so agent can see them)
+        for row in results:
+            print(",".join(CSV_COLUMNS))
+            print(",".join(str(row[col]) for col in CSV_COLUMNS) + "\n")
+
+        # Then save to CSV
         output_path = Path(args.output)
         df_new = pd.DataFrame(results)
 

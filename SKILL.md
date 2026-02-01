@@ -124,12 +124,7 @@ Three modes: **gen_ini** (generate INI only), **run** (run with existing INI), *
 Extract 21 metrics from MT4 HTML reports to CSV.
 
 ```bash
-# Parse single file, print to stdout
-~\.claude\skills\mt4-backtester\.venv\Scripts\python.exe \
-    ~\.claude\skills\mt4-backtester\scripts\parse_report.py \
-    output/report.htm
-
-# Append to CSV (creates if not exists)
+# Parse single file, output to CSV (creates if not exists)
 ~\.claude\skills\mt4-backtester\.venv\Scripts\python.exe \
     ~\.claude\skills\mt4-backtester\scripts\parse_report.py \
     output/report.htm --output mt4_bt_log.csv
@@ -138,6 +133,11 @@ Extract 21 metrics from MT4 HTML reports to CSV.
 ~\.claude\skills\mt4-backtester\.venv\Scripts\python.exe \
     ~\.claude\skills\mt4-backtester\scripts\parse_report.py \
     output/ --output mt4_bt_log.csv
+
+# Parse and print to stdio only, no CSV (DO NO use unless requested by user)
+~\.claude\skills\mt4-backtester\.venv\Scripts\python.exe \
+    ~\.claude\skills\mt4-backtester\scripts\parse_report.py \
+    output/report.htm
 ```
 
 **CSV Schema** (22 columns):

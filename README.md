@@ -49,7 +49,7 @@ All 6 backtests completed successfully!
 Run the automated installer from this project folder:
 
 ```cmd
-cd C:\Users\adrian\dev\mt4-backtester
+cd C:\Users\UserName\dev\mt4-backtester
 install_skill.bat
 ```
 

@@ -492,11 +492,11 @@ def run_backtest(
             end = report_data.get('end_date_raw', '')
             trades = report_data.get('trade_num', 0)
 
-            # Error 1: ZERO_DATE (TDS indexing)
+            # Error 1: ZERO_DATA (TDS indexing)
             if start.startswith(ZERO_DATE) or end.startswith(ZERO_DATE):
                 return {
                     "success": False,
-                    "error": "TDS_INDEXING: Zero date detected (TDS indexing in progress)",
+                    "error": "ZERO_DATA: Data not available",
                     "report_path": str(report_file),
                     "duration": duration
                 }
@@ -505,7 +505,7 @@ def run_backtest(
             if start and end and start.split()[0] == end.split()[0]:  # Compare date part only
                 return {
                     "success": False,
-                    "error": "ZERO_TIME_RANGE: Start date equals end date",
+                    "error": "ZERO_TIME_RANGE: Start date equals End date",
                     "report_path": str(report_file),
                     "duration": duration
                 }
