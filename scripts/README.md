@@ -32,7 +32,7 @@ python scripts/mt4_runner.py --terminal mt4-01 --ea "KO\GM.ex4" --set file.set -
 | Input | Behavior |
 |-------|----------|
 | Not specified | Uses default: `./results` (or `mt4_bt_output` from .env if exists) |
-| Directory only: `"output"` | Uses specified directory, auto-generates filename: `setfile_YYYYMMDD_HHMMSS.htm` |
+| Directory only: `"output"` | Uses specified directory, auto-generates filename: `setfile_S<spread>_YYYYMMDD_HHMMSS.htm` |
 | Full path with .htm: `"output/myreport.htm"` | Uses specified directory AND exact filename |
 
 ### `--set`
@@ -112,16 +112,24 @@ python scripts/mt4_runner.py \
 ### Parallel Tests (4 terminals)
 ```bash
 # Terminal 1 - Spread 1
-python scripts/mt4_runner.py --terminal mt4-01 --ea "KO\GM(Pro)_V1.32_AlgoX_REAL.ex4" --set 7221_GBPNZD_B_M1_125_6k38_11.set --symbol GBPNZD --period M1 --spread 1 --fromdate "2026-01-01" --todate "2026-02-01" --model 0 --report-path "output/7221_S1.htm" --timeout 600 &
+python scripts/mt4_runner.py --terminal mt4-01 --ea "KO\GM(Pro)_V1.32_AlgoX_REAL.ex4" --set 7221_GBPNZD_B_M1_125_6k38_11.set --symbol GBPNZD --period M1 --spread 1 --fromdate "2026-01-01" --todate "2026-02-01" --model 0 --report-path "output" --timeout 600 &
 
 # Terminal 2 - Spread 10
-python scripts/mt4_runner.py --terminal mt4-02 --ea "KO\GM(Pro)_V1.32_AlgoX_REAL.ex4" --set 7221_GBPNZD_B_M1_125_6k38_11.set --symbol GBPNZD --period M1 --spread 10 --fromdate "2026-01-01" --todate "2026-02-01" --model 0 --report-path "output/7221_S10.htm" --timeout 600 &
+python scripts/mt4_runner.py --terminal mt4-02 --ea "KO\GM(Pro)_V1.32_AlgoX_REAL.ex4" --set 7221_GBPNZD_B_M1_125_6k38_11.set --symbol GBPNZD --period M1 --spread 10 --fromdate "2026-01-01" --todate "2026-02-01" --model 0 --report-path "output" --timeout 600 &
 
 # Terminal 3 - Spread 20
-python scripts/mt4_runner.py --terminal mt4-03 --ea "KO\GM(Pro)_V1.32_AlgoX_REAL.ex4" --set 7221_GBPNZD_B_M1_125_6k38_11.set --symbol GBPNZD --period M1 --spread 20 --fromdate "2026-01-01" --todate "2026-02-01" --model 0 --report-path "output/7221_S20.htm" --timeout 600 &
+python scripts/mt4_runner.py --terminal mt4-03 --ea "KO\GM(Pro)_V1.32_AlgoX_REAL.ex4" --set 7221_GBPNZD_B_M1_125_6k38_11.set --symbol GBPNZD --period M1 --spread 20 --fromdate "2026-01-01" --todate "2026-02-01" --model 0 --report-path "output" --timeout 600 &
 
 # Terminal 4 - Spread 30
-python scripts/mt4_runner.py --terminal mt4-04 --ea "KO\GM(Pro)_V1.32_AlgoX_REAL.ex4" --set 7221_GBPNZD_B_M1_125_6k38_11.set --symbol GBPNZD --period M1 --spread 30 --fromdate "2026-01-01" --todate "2026-02-01" --model 0 --report-path "output/7221_S30.htm" --timeout 600 &
+python scripts/mt4_runner.py --terminal mt4-04 --ea "KO\GM(Pro)_V1.32_AlgoX_REAL.ex4" --set 7221_GBPNZD_B_M1_125_6k38_11.set --symbol GBPNZD --period M1 --spread 30 --fromdate "2026-01-01" --todate "2026-02-01" --model 0 --report-path "output" --timeout 600 &
+```
+
+### Generates files like:
+```
+7221_GBPNZD_B_M1_125_6k38_11_S1_20260201_120000.htm
+7221_GBPNZD_B_M1_125_6k38_11_S10_20260201_120003.htm
+7221_GBPNZD_B_M1_125_6k38_11_S20_20260201_120006.htm
+7221_GBPNZD_B_M1_125_6k38_11_S30_20260201_120009.htm
 ```
 
 ---
@@ -156,4 +164,4 @@ mt4_bt_sets=.\sets
 | Source | Usage |
 |--------|-------|
 | Dukascopy | Default - most pairs |
-| Alpari-Standard1 | GBPSGD only |
+| Alpari-Standard1 | GBPSGD |

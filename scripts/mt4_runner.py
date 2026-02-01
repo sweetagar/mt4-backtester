@@ -283,21 +283,23 @@ def adjust_copied_set_file(copied_set_path: str, adjustments: dict) -> None:
         f.writelines(modified)
 
 
-def generate_report_name(set_file: str, suffix: str = None) -> str:
-    """Generate report name from set file + timestamp.
+def generate_report_name(set_file: str, spread: int = None, suffix: str = None) -> str:
+    """Generate report name from set file + spread + timestamp.
 
     Args:
         set_file: Set file name (with or without .set extension)
-        suffix: Optional suffix (e.g., "_S10")
+        spread: Test spread value (optional)
+        suffix: Optional suffix (e.g., "_extra")
 
     Returns:
-        Report name: setfilename_YYYYMMDD_HHMMSS[suffix].htm
+        Report name: setfilename_S<spread>_YYYYMMDD_HHMMSS.htm
+                    or setfilename_YYYYMMDD_HHMMSS.htm if no spread
     """
     base = Path(set_file).stem  # Remove .set extension
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-    if suffix:
-        return f"{base}_{timestamp}{suffix}.htm"
+    if spread is not None:
+        return f"{base}_S{spread}_{timestamp}.htm"
     return f"{base}_{timestamp}.htm"
 
 
@@ -377,8 +379,9 @@ def build_ini_content(args: argparse.Namespace) -> str:
         # Filename extracted from --report-path (e.g., "myreport_S10.htm")
         lines.append(f"TestReport=tester\\{args.report_filename}")
     elif hasattr(args, 'set') and args.set:
-        # GEN/FULL mode: generate report name from set file + timestamp
-        report = generate_report_name(args.set)
+        # GEN/FULL mode: generate report name from set file + spread + timestamp
+        report_spread = args.spread if hasattr(args, 'spread') and args.spread else None
+        report = generate_report_name(args.set, report_spread)
         lines.append(f"TestReport=tester\\{report}")
 
     if hasattr(args, 'replace_report') and args.replace_report is not None:
@@ -475,6 +478,47 @@ def run_backtest(
                 "report_path": None,
                 "duration": duration
             }
+
+        # Check for data availability issues
+        import sys
+        skill_dir = Path(__file__).parent
+        sys.path.insert(0, str(skill_dir))
+        try:
+            from parse_report import parse_header
+            report_data = parse_header(report_file)
+
+            ZERO_DATE = "1970.01.01"
+            start = report_data.get('start_date_raw', '')
+            end = report_data.get('end_date_raw', '')
+            trades = report_data.get('trade_num', 0)
+
+            # Error 1: ZERO_DATE (TDS indexing)
+            if start.startswith(ZERO_DATE) or end.startswith(ZERO_DATE):
+                return {
+                    "success": False,
+                    "error": "TDS_INDEXING: Zero date detected (TDS indexing in progress)",
+                    "report_path": str(report_file),
+                    "duration": duration
+                }
+
+            # Error 2: Zero Time Range (start == end)
+            if start and end and start.split()[0] == end.split()[0]:  # Compare date part only
+                return {
+                    "success": False,
+                    "error": "ZERO_TIME_RANGE: Start date equals end date",
+                    "report_path": str(report_file),
+                    "duration": duration
+                }
+
+            # Warning 3: Zero trades - WARNING only, continue
+            if trades == 0:
+                print(f"[WARN] Zero trades in report - EA may not have taken any trades")
+        except ImportError:
+            # parse_report.py not available - skip check
+            pass
+        except Exception as e:
+            # Parse error - continue, will be caught by full parse later
+            pass
 
         # Move report to target directory if specified
         if report_path:
@@ -735,10 +779,14 @@ def main():
         ini_dir = Path(config["ini"])
         ini_dir.mkdir(parents=True, exist_ok=True)
 
-        # Generate filename: setfile_timestamp.ini
+        # Generate filename: setfile_S<spread>_timestamp.ini
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         set_name = Path(set_filename).stem
-        ini_filename = f"{set_name}_{timestamp}.ini"
+        test_spread = args.spread if hasattr(args, 'spread') and args.spread else 0
+        if test_spread > 0:
+            ini_filename = f"{set_name}_S{test_spread}_{timestamp}.ini"
+        else:
+            ini_filename = f"{set_name}_{timestamp}.ini"
         ini_path = ini_dir / ini_filename
 
         with open(ini_path, 'w') as f:

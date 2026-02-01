@@ -30,7 +30,7 @@ C:\Users\adrian\dev\mt4-test-folder\     # CWD
 
 ### Skill Folder
 Contains Python scripts.
-
+***IMPORTANT*** Always find the skills Folder and its venv!! for opencode users, replace ~/.claude/skills/ to ~/.config/opencode/skills in ALL command calls!!
 ```
 ~/.claude/skills/mt4-backtester/
 ├── scripts/                           # Python scripts
@@ -182,12 +182,12 @@ mt4_spread_params=entry_max_spread_allowed_in_points,exit_max_spread_allowed_in_
 3. Parse results with parse_report.py
 ```
 
-### Parallel Testing (Future: mt4_parallel.py)
+### Parallel Testing
 
 **Terminal Pool Pattern** - Queue tasks and start queued tasks as terminals free up:
 ***IMPORTANT*** Make Sure MAX terminal background tasks is running until task completed without error
-1. Start up to number of terminals in .env
-2. Monitor with TaskOutput - check each task as it completes
+1. Start up to number of terminals in .env (wait/sleep/timeout 3s between each task start)
+2. Monitor with TaskOutput - check [EVERY 30s] if any terminal task completes
 3. When a terminal completes:
     - Parse (without --output) and verify results
     - If `trade_num = 0` (data not available) or missing report: **rerun on same terminal**
@@ -196,6 +196,38 @@ mt4_spread_params=entry_max_spread_allowed_in_points,exit_max_spread_allowed_in_
 5. Start new backtround immediately if a task is completed without error, repeat until queue empty
 
 **MAX concurrent tests = Number of terminals in .env** (mt4-XX entries)
+
+#### Always Use this format to Report Current Status While Running Tasks 
+
+```
+┌─────────┬──────────┬──────┬────────┬─────────┐
+│ Task ID │ Terminal │ Set  │ Spread │ Status  │
+├─────────┼──────────┼──────┼────────┼─────────┤
+│ b8bda5c │ mt4-01   │ 7150 │ 10     │ Running │
+├─────────┼──────────┼──────┼────────┼─────────┤
+│ b28813f │ mt4-02   │ 7151 │ 10     │ Running │
+├─────────┼──────────┼──────┼────────┼─────────┤
+│ bde67e5 │ mt4-03   │ 7152 │ 10     │ Running │
+├─────────┼──────────┼──────┼────────┼─────────┤
+│ b364fdb │ mt4-04   │ 7150 │ 20     │ Running │
+└─────────┴──────────┴──────┴────────┴─────────┘
+```
+
+#### Always Use this format to Report Results When All Completed
+
+```
+┌──────────┬────────┬────────────┬───────────┬──────────┬────────┬─────────┐
+│ Set      │ Spread │ Net Profit │ MDD       │ PM_Ratio │ Trades │ Cycles  │
+├──────────┼────────┼────────────┼───────────┼──────────┼────────┼─────────┤
+│ 7150     │ 10     │ 15234.50   │ -2341.20  │ 6.51     │ 1234   │ 45      │
+├──────────┼────────┼────────────┼───────────┼──────────┼────────┼─────────┤
+│ 7151     │ 10     │ 8765.30    │ -1234.50  │ 7.10     │ 987    │ 38      │
+├──────────┼────────┼────────────┼───────────┼──────────┼────────┼─────────┤
+│ 7152     │ 10     │ -1234.50   │ -3456.70  │ -0.36    │ 654    │ 28      │
+├──────────┼────────┼────────────┼───────────┼──────────┼────────┼─────────┤
+│ 7150     │ 20     │ 5432.10    │ -1876.30  │ 2.90     │ 876    │ 32      │
+└──────────┴────────┴────────────┴───────────┴──────────┴────────┴─────────┘
+```
 
 
 ## Technical Notes
