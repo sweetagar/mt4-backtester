@@ -14,7 +14,7 @@ The project folder where commands are executed. Contains configuration and data.
 ***IMPORTANT*** Always first read .env file in CWD to find out where things are!
 
 ```
-C:\Users\adrian\dev\mt4-test-folder\     # CWD
+~\My_Projects\mt4-test-folder\          # CWD
 ├── .env                                # Terminal paths, spread params, output locations
 ├── sets/                               # EA .set files (master copies) [mt4_bt_sets]
 ├── output/                             # HTML reports from MT4 [mt4_bt_output]
@@ -30,25 +30,35 @@ C:\Users\adrian\dev\mt4-test-folder\     # CWD
 
 ### Skill Folder
 Contains Python scripts.
-***IMPORTANT*** Always find the skills Folder and its venv!! for opencode users, replace ~/.claude/skills/ to ~/.config/opencode/skills in ALL command calls!!
+***IMPORTANT*** Always find the skills Folder and its venv!! for opencode users, replace ~\.claude\skills\ to ~\.config\opencode\skills\ in ALL command calls!!
+
+**Windows paths:**
 ```
-~/.claude/skills/mt4-backtester/
+# Claude Code
+~\.claude\skills\mt4-backtester\
+
+# OpenCode
+~\.config\opencode\skills\mt4-backtester\
+
+# Structure (both)
 ├── scripts/                           # Python scripts
 │   ├── mt4_runner.py                  # Backtest runner
 │   └── parse_report.py                # Report parser
+├── references/                        # SOP documents (loaded on-demand)
+│   └── SOP_SPREAD_QC.md               # Spread Boundary Search & QC workflow
 ├── requirements.txt                   # Python dependencies
 └── SKILL.md
 ```
 
 ## Skill Setup
 
-The skill requires a Python virtual environment. If `.venv/` folder is missing:
+The skill requires a Python virtual environment. If `.venv/` or `venv/` folder is missing:
 
 ```bash
 # From skill folder
-cd ~/.claude/skills/mt4-backtester
+cd ~\.claude\skills\mt4-backtester
 python -m venv .venv
-.venv/Scripts/pip install -r requirements.txt
+.venv\Scripts\pip install -r requirements.txt
 ```
 
 **Dependencies** (from requirements.txt):
@@ -63,15 +73,15 @@ Run a single backtest and parse results:
 
 ```bash
 # From CWD, using skill's Python
-~/.claude/skills/mt4-backtester/.venv/Scripts/python.exe \
-    ~/.claude/skills/mt4-backtester/scripts/mt4_runner.py \
+~\.claude\skills\mt4-backtester\.venv\Scripts\python.exe \
+    ~\.claude\skills\mt4-backtester\scripts\mt4_runner.py \
     --ea "MyEA.ex4" \
     --set file.set \
     --symbol EURUSD \
     --terminal mt4-01
 
-~/.claude/skills/mt4-backtester/.venv/Scripts/python.exe \
-    ~/.claude/skills/mt4-backtester/scripts/parse_report.py \
+~\.claude\skills\mt4-backtester\.venv\Scripts\python.exe \
+    ~\.claude\skills\mt4-backtester\scripts\parse_report.py \
     output/report.htm --output mt4_bt_log.csv
 ```
 
@@ -83,8 +93,8 @@ Three modes: **gen_ini** (generate INI only), **run** (run with existing INI), *
 
 **Full mode** (most common):
 ```bash
-~/.claude/skills/mt4-backtester/.venv/Scripts/python.exe \
-    ~/.claude/skills/mt4-backtester/scripts/mt4_runner.py \
+~\.claude\skills\mt4-backtester\.venv\Scripts\python.exe \
+    ~\.claude\skills\mt4-backtester\scripts\mt4_runner.py \
     --terminal mt4-01 \
     --ea "KO\GM(Pro)_V1.33_AlgoX_REAL" \
     --set file.set \
@@ -115,18 +125,18 @@ Extract 21 metrics from MT4 HTML reports to CSV.
 
 ```bash
 # Parse single file, print to stdout
-~/.claude/skills/mt4-backtester/.venv/Scripts/python.exe \
-    ~/.claude/skills/mt4-backtester/scripts/parse_report.py \
+~\.claude\skills\mt4-backtester\.venv\Scripts\python.exe \
+    ~\.claude\skills\mt4-backtester\scripts\parse_report.py \
     output/report.htm
 
 # Append to CSV (creates if not exists)
-~/.claude/skills/mt4-backtester/.venv/Scripts/python.exe \
-    ~/.claude/skills/mt4-backtester/scripts/parse_report.py \
+~\.claude\skills\mt4-backtester\.venv\Scripts\python.exe \
+    ~\.claude\skills\mt4-backtester\scripts\parse_report.py \
     output/report.htm --output mt4_bt_log.csv
 
 # Parse all .htm files in directory
-~/.claude/skills/mt4-backtester/.venv/Scripts/python.exe \
-    ~/.claude/skills/mt4-backtester/scripts/parse_report.py \
+~\.claude\skills\mt4-backtester\.venv\Scripts\python.exe \
+    ~\.claude\skills\mt4-backtester\scripts\parse_report.py \
     output/ --output mt4_bt_log.csv
 ```
 
@@ -229,6 +239,17 @@ mt4_spread_params=entry_max_spread_allowed_in_points,exit_max_spread_allowed_in_
 └──────────┴────────┴────────────┴───────────┴──────────┴────────┴─────────┘
 ```
 
+---
+
+## References
+
+| Document | Trigger Keywords | Purpose |
+|----------|------------------|---------|
+| `references/SOP_SPREAD_QC.md` | QC, Spread Sweep, Spread Boundary, Boundary Search | Find min/max spread where EA produces 0 SL |
+
+When user mentions these keywords, agent should read the referenced SOP document and follow the detailed procedure.
+
+---
 
 ## Technical Notes
 
@@ -246,9 +267,9 @@ The virtual environment doesn't exist. Create it:
 
 ```bash
 # From skill folder
-cd C:/Users/adrian/.claude/skills/mt4-backtester
+cd ~\.claude\skills\mt4-backtester
 python -m venv .venv
-.venv/Scripts/pip install -r requirements.txt
+.venv\Scripts\pip install -r requirements.txt
 ```
 
 ### Alternative: Use system Python
@@ -256,7 +277,7 @@ python -m venv .venv
 If venv setup fails, use system Python directly (ensure dependencies are installed):
 
 ```bash
-python C:/Users/adrian/.claude/skills/mt4-backtester/scripts/mt4_runner.py ...
+python ~\.claude\skills\mt4-backtester\scripts\mt4_runner.py ...
 ```
 
 ### TDS Data Source

@@ -44,30 +44,48 @@ All 6 backtests completed successfully!
 
 ## Installation
 
-### Step 1: Copy Skill to Skills/ Folder
+### Quick Install (Recommended)
+
+Run the automated installer from this project folder:
+
+```cmd
+cd C:\Users\adrian\dev\mt4-backtester
+install_skill.bat
+```
+
+The installer will:
+- Copy skill files to your chosen location (Claude Code / OpenCode / Both)
+- Create Python virtual environment (`.venv`)
+- Install all required dependencies
+
+Follow the on-screen prompts to complete installation.
+
+---
+
+### Manual Install
+
+If you prefer manual installation:
+
+**Step 1: Copy Skill to Skills/ Folder**
 
 Copy the skill folder structure to your Claude skills directory:
 
 ```
-~/.claude/skills/mt4-backtester/
+~\.claude\skills\mt4-backtester\
 ├── SKILL.md
 ├── requirements.txt
-└── scripts/
+├── references\
+│   └── SOP_SPREAD_QC.md
+└── scripts\
     ├── mt4_runner.py
     └── parse_report.py
 ```
 
-**For Claude Code**
-```
-C:\Users\YourUsername\.claude\skills\mt4-backtester\
-```
+**For Claude Code:** `C:\Users\YourUsername\.claude\skills\mt4-backtester\`
 
-**For OpenCode**
-```
-C:\Users\YourUsername\.config\opencode\skills\mt4-backtester\
-```
+**For OpenCode:** `C:\Users\YourUsername\.config\opencode\skills\mt4-backtester\`
 
-### Step 2: Create Python Virtual Environment
+**Step 2: Create Python Virtual Environment**
 
 ```cmd
 cd C:\Users\YourUsername\.claude\skills\mt4-backtester
