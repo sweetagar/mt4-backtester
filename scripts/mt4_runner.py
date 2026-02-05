@@ -756,10 +756,31 @@ def main():
         set_full_path, set_filename = resolve_set_file(args.set, config["sets"])
         set_dest = tester_dir / set_filename
 
-        # Copy set file to tester folder (only if not already there or different)
-        if not set_dest.exists() or set_dest.resolve() != Path(set_full_path).resolve():
+        # Copy set file to tester folder (always copy if source is newer or different)
+        copy_needed = True
+        if set_dest.exists():
+            # Check if source is newer than destination
+            src_mtime = Path(set_full_path).stat().st_mtime
+            dst_mtime = set_dest.stat().st_mtime
+            if src_mtime <= dst_mtime:
+                copy_needed = False
+
+        if copy_needed:
             shutil.copy2(set_full_path, set_dest)
             print(f"[SET] Copied: {set_filename} -> tester/")
+        else:
+            print(f"[SET] Skipped (up-to-date): {set_filename}")
+
+        # Clear tester/files/ cache to avoid issues from previous runs
+        files_dir = tester_dir / "files"
+        if files_dir.exists():
+            try:
+                # Remove all .hcc, .hca, and other cache files
+                for cache_file in files_dir.glob("*"):
+                    cache_file.unlink()
+                print(f"[SET] Cleared cache: tester/files/")
+            except Exception as e:
+                print(f"[WARN] Could not clear cache: {e}")
 
         # Check if test spread exceeds EA spread params (adjust copied file if needed)
         if hasattr(args, 'spread') and args.spread and config["spread_params"]:
